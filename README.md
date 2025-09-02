@@ -16,7 +16,7 @@ A thrilling browser-based earthquake simulation game featuring Rocky, a brave ch
 ## 🚀 Quick Start
 
 ### Play Online
-Visit the live game: [https://your-project.vercel.app](https://your-project.vercel.app)
+Visit the live game: https://seismic-dash.vercel.app/
 
 ### Local Development
 1. **Clone the repository:**
