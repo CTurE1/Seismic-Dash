@@ -995,11 +995,18 @@ function shouldUpdatePlayerScore(newScore) {
 async function saveLeaderboard(){
   if (playerName.trim() && currentPlayerScore > 0) {
     try {
-      const updatedLeaderboard = await GlobalLeaderboard.addScore(
+      // Добавляем таймаут для API запроса
+      const apiPromise = GlobalLeaderboard.addScore(
         playerName.trim(), 
         currentPlayerScore, 
         currentMagnitudeLabel
       );
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('API timeout')), 10000)
+      );
+      
+      const updatedLeaderboard = await Promise.race([apiPromise, timeoutPromise]);
       
       if (updatedLeaderboard) {
         leaderboard = updatedLeaderboard;
@@ -1053,18 +1060,36 @@ function keyPressed(){
     if (keyCode === ENTER) {
       if (playerName.trim()) {
         savePlayerName();
+        
+        // Добавляем таймаут для предотвращения зависания
+        const saveTimeout = setTimeout(() => {
+          console.warn('Save leaderboard timeout - using local fallback');
+          saveLeaderboardLocal();
+          isEnteringName = false;
+          showLeaderboard = true;
+        }, 5000); // 5 секунд таймаут
+        
         saveLeaderboard().then(() => {
+          clearTimeout(saveTimeout);
           console.log('Result saved to leaderboard');
+          isEnteringName = false;
+          showLeaderboard = true;
         }).catch(error => {
+          clearTimeout(saveTimeout);
           console.error('Error saving result:', error);
+          // Fallback на локальное сохранение
+          saveLeaderboardLocal();
+          isEnteringName = false;
+          showLeaderboard = true;
         });
-        isEnteringName = false;
-        showLeaderboard = true;
       }
     } else if (keyCode === BACKSPACE) {
       playerName = playerName.slice(0, -1);
-    } else if (key.length === 1 && playerName.length < 20) {
-      playerName += key;
+    } else if (key && key.length === 1 && playerName.length < 20) {
+      // Дополнительная проверка на валидные символы
+      if (/[a-zA-Z0-9\s\-_\.]/.test(key)) {
+        playerName += key;
+      }
     }
   }
 }
