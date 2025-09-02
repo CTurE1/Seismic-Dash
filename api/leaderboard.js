@@ -30,7 +30,10 @@ async function jsonbinGet() {
   if (!r.ok) throw new Error(`jsonbin GET error ${r.status}`);
   const j = await r.json();
   // ожидаем структуру вида { record: { leaderboard: [...] } }
-  return j.record?.leaderboard || [];
+  const allRecords = j.record?.leaderboard || [];
+  
+  // Сразу применяем фильтрацию уникальных игроков
+  return sortAndTrim(allRecords, 10);
 }
 
 // Сохранить лидерборд в JSONBin.io
@@ -123,14 +126,22 @@ export default async function handler(req, res) {
       const payload = JSON.parse(body || '{}');
       const entry = sanitizeEntry(payload);
 
-      // Загружаем текущий лидерборд
-      const leaderboard = await jsonbinGet();
+      // Загружаем все записи (без фильтрации) для добавления нового результата
+      const r = await fetch(`${JSONBIN_BASE}/${BIN_ID}/latest`, {
+        headers: {
+          'X-Master-Key': SECRET,
+          ...(READ_KEY ? { 'X-Access-Key': READ_KEY } : {}),
+        }
+      });
+      if (!r.ok) throw new Error(`jsonbin GET error ${r.status}`);
+      const j = await r.json();
+      const allRecords = j.record?.leaderboard || [];
       
       // Добавляем новый результат
-      leaderboard.push(entry);
+      allRecords.push(entry);
       
-      // Сортируем и обрезаем до топ-10
-      const trimmed = sortAndTrim(leaderboard, 10);
+      // Сортируем и обрезаем до топ-10 (с фильтрацией уникальных игроков)
+      const trimmed = sortAndTrim(allRecords, 10);
       
       // Сохраняем обратно
       await jsonbinPut(trimmed);
