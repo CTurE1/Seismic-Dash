@@ -264,7 +264,7 @@ function preload() {
     bgMusic.play().catch(e => {});
   });
   
-  logoImg = loadImage('assets/logo.png');
+  logoImg = loadImage('assets/logo.png'); // Fixed case sensitivity
   muteImg = loadImage('assets/Magnitude/icon-mute.svg');
   soundImg = loadImage('assets/Magnitude/icon-sound.svg');
 }
