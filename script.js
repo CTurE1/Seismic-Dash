@@ -452,8 +452,12 @@ function draw() {
   rocky.update(spacePressed);
   rocky.show();
 
-// Obstacle spawning
-if (stones.length < 4) {
+// Obstacle spawning with improved randomness
+// Sometimes spawn multiple stones in quick succession for intensity
+const shouldSpawnMultiple = random() < 0.15 && stones.length < 2; // 15% chance when few stones
+const maxStones = shouldSpawnMultiple ? 6 : 4;
+
+if (stones.length < maxStones) {
 	const lastRight = stones.length
 	  ? (stones[stones.length - 1].x + stones[stones.length - 1].w * (stones[stones.length - 1].scale || 1))
 	  : width;
@@ -462,8 +466,20 @@ if (stones.length < 4) {
 	const relSpeed  = (gameSpeed + 0.8);
 	const stoneW   = stoneImg ? stoneImg.width : 48;
   
-    const MIN_GAP = Math.max(500, relSpeed * airFrames + stoneW * 0.9 + 100);
-    const MAX_GAP = MIN_GAP + 400;
+	// Base safe gap calculation
+	const baseSafeGap = Math.max(500, relSpeed * airFrames + stoneW * 0.9 + 100);
+	
+	// Dynamic difficulty variation based on score and game state
+	const difficultyWave = sin(frameCount * 0.002) * 0.3 + 0.7; // 0.4 to 1.0
+	const scoreMultiplier = 1 + (score / 10000) * 0.2; // Slightly more frequent at higher scores
+	const randomIntensity = random(0.6, 1.4); // Random intensity factor
+	
+	// Calculate gap range with much more variation
+	const baseGap = baseSafeGap * difficultyWave * scoreMultiplier * randomIntensity;
+	const variation = baseGap * 0.8; // 80% variation from base
+	
+	const MIN_GAP = Math.max(baseSafeGap * 0.7, baseGap - variation); // Never too close
+	const MAX_GAP = baseGap + variation; // Can be much further
   
 	const spawnX = Math.max(width, lastRight) + random(MIN_GAP, MAX_GAP);
 	
@@ -477,7 +493,12 @@ if (stones.length < 4) {
 		logStoneStats();
 	}
 	
-	console.log(`🪨 Created stone #${stoneIndex + 1}, position: ${spawnX.toFixed(0)}, gap: ${(spawnX - lastRight).toFixed(0)}`);
+	// Enhanced logging for new spawn system
+	const gap = spawnX - lastRight;
+	const difficulty = (difficultyWave * 100).toFixed(1);
+	const intensity = (randomIntensity * 100).toFixed(1);
+	
+	console.log(`🪨 Stone #${stoneIndex + 1} | Pos: ${spawnX.toFixed(0)} | Gap: ${gap.toFixed(0)} | Difficulty: ${difficulty}% | Intensity: ${intensity}% | Multi: ${shouldSpawnMultiple ? 'YES' : 'NO'}`);
 	
 	stones.push(new Stone(randomStoneImg, spawnX));
   }
