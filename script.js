@@ -264,7 +264,7 @@ function preload() {
     bgMusic.play().catch(e => {});
   });
   
-  logoImg = loadImage('assets/logo.png'); // Fixed case sensitivity
+  // logoImg = loadImage('assets/logo.png'); // Temporarily disabled
   muteImg = loadImage('assets/Magnitude/icon-mute.svg');
   soundImg = loadImage('assets/Magnitude/icon-sound.svg');
 }
@@ -1035,6 +1035,11 @@ function saveLeaderboardLocal(){
 // Controls
 function keyPressed(){
   if (key === ' ') {
+    // Start background music on first user interaction
+    if (bgMusic && bgMusic.paused && !isMuted) {
+      bgMusic.play().catch(e => console.log('Error starting background music:', e));
+    }
+    
     if (gameOver) {
       restart();
       return;

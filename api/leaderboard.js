@@ -65,9 +65,21 @@ function sanitizeEntry(e) {
 
 // Сортировка и обрезка лидерборда
 function sortAndTrim(arr, limit = 10) {
-  // сортировка по очкам (по убыванию)
-  arr.sort((a, b) => b.score - a.score);
-  return arr.slice(0, limit);
+  // Группируем по имени игрока и оставляем только лучший результат
+  const playerBestScores = {};
+  
+  arr.forEach(entry => {
+    const playerName = entry.name.toLowerCase().trim();
+    if (!playerBestScores[playerName] || entry.score > playerBestScores[playerName].score) {
+      playerBestScores[playerName] = entry;
+    }
+  });
+  
+  // Преобразуем обратно в массив и сортируем по очкам
+  const uniquePlayers = Object.values(playerBestScores);
+  uniquePlayers.sort((a, b) => b.score - a.score);
+  
+  return uniquePlayers.slice(0, limit);
 }
 
 // Простой rate-limit (не чаще чем раз в 1.5 секунды)
