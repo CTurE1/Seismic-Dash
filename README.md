@@ -116,7 +116,7 @@ seismic-dash/
 4. **Deploy:**
    - Click "Deploy"
    - Wait for deployment to complete
-   - Your game will be available at `https://your-project.vercel.app`
+   - Your game will be available at https://seismic-dash.vercel.app/
 
 ## 🔒 Security Features
 
