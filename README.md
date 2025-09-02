@@ -252,11 +252,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **JSONBin.io** - For simple and reliable data storage
 - **The Coding Train** - Original inspiration for the game mechanics
 
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/your-username/seismic-dash/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/seismic-dash/discussions)
-- **Email**: your-email@example.com
 
 ---
 
