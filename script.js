@@ -253,7 +253,7 @@ function preload() {
   sfxEarthquake = new Audio('assets/Magnitude/earthquake.mp3');
   sfxJump = new Audio('assets/Magnitude/jump.mp3');
   sfxJump.volume = 0.5;
-  sfxGameOver = new Audio('assets/Magnitude/gameover.mp3');
+  sfxGameOver = new Audio('assets/Magnitude/GameOver.mp3');
   
   bgMusic = new Audio('assets/Magnitude/background.mp3');
   bgMusic.loop = true;
@@ -264,7 +264,7 @@ function preload() {
     bgMusic.play().catch(e => {});
   });
   
-  logoImg = loadImage('assets/Logo.png');
+  logoImg = loadImage('assets/logo.png');
   muteImg = loadImage('assets/Magnitude/icon-mute.svg');
   soundImg = loadImage('assets/Magnitude/icon-sound.svg');
 }
