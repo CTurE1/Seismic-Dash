@@ -19,15 +19,15 @@ let hasPlayerName = false;
 let gameSpeed = 6;
 const SPEED_GROWTH = 0.0003;
 
-// Magnitude levels (7 levels)
+// Magnitude levels (7 levels) - Made 3x harder!
 const MAG_LEVELS = [
-  { label: "Magnitude 1.0", score:  200, stones: 5,  speed: 5.8 },
-  { label: "Magnitude 2.0", score: 1100, stones: 25,  speed: 6.2 },
-  { label: "Magnitude 3.0", score: 2300, stones: 40,  speed: 6.6 },
-  { label: "Magnitude 4.0", score: 4100, stones: 60,  speed: 7.0 },
-  { label: "Magnitude 5.0", score: 6500, stones: 85,  speed: 7.5 },
-  { label: "Magnitude 6.0", score: 9800, stones: 115, speed: 8.0 },
-  { label: "Magnitude 7.0", score: 14500, stones: 150, speed: 8.6 },
+  { label: "Magnitude 1.0", score:  600, stones: 15,  speed: 5.8 },
+  { label: "Magnitude 2.0", score: 3300, stones: 75,  speed: 6.2 },
+  { label: "Magnitude 3.0", score: 6900, stones: 120, speed: 6.6 },
+  { label: "Magnitude 4.0", score: 12300, stones: 180, speed: 7.0 },
+  { label: "Magnitude 5.0", score: 19500, stones: 255, speed: 7.5 },
+  { label: "Magnitude 6.0", score: 29400, stones: 345, speed: 8.0 },
+  { label: "Magnitude 7.0", score: 43500, stones: 450, speed: 8.6 },
 ];
 
 // Magnitude color palette
