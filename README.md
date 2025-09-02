@@ -255,6 +255,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made with ❤️ for the gaming community**
+**Made with ❤️ for the Saismic community**
 
 *Experience the thrill of surviving earthquakes in this exciting browser game!*
