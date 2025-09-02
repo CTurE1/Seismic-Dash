@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>JSONBin.io Connection Test</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 JSONBin.io Connection Test</h1>
+        
+        <div class="info">
+            <h3>Current configuration:</h3>
+            <p><strong>API Key:</strong> $2a$10$TU2kMRuYG3VK4cspRTU5Je6851NeZzUUSMZm5g4vfQmVQrZmDxoNe</p>
+            <p><strong>BIN ID:</strong> 68b4cc5bae596e708fde2728</p>
+        </div>
+
+        <div>
+            <button onclick="testLoad()">Test Load</button>
+            <button onclick="testSave()">Test Save</button>
+            <button onclick="createNewBin()">Create New Bin</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_KEY = '$2a$10$TU2kMRuYG3VK4cspRTU5Je6851NeZzUUSMZm5g4vfQmVQrZmDxoNe';
+        const BIN_ID = '68b4cc5bae596e708fde2728';
+        const BASE_URL = 'https://api.jsonbin.io/v3/b';
+
+        function showResult(message, isSuccess = true) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="result ${isSuccess ? 'success' : 'error'}">
+                    <h3>${isSuccess ? '✅' : '❌'} ${isSuccess ? 'Success' : 'Error'}</h3>
+                    <pre>${message}</pre>
+                </div>
+            `;
+        }
+
+        async function testLoad() {
+            try {
+                const response = await fetch(`${BASE_URL}/${BIN_ID}`, {
+                    headers: {
+                        'X-Master-Key': API_KEY
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const leaderboard = data.record.leaderboard || [];
+                
+                showResult(`Load successful!\nRecords in leaderboard: ${leaderboard.length}\nData: ${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                showResult(`Load error: ${error.message}`, false);
+            }
+        }
+
+        async function testSave() {
+            try {
+                const testData = {
+                    leaderboard: [
+                        {
+                            name: 'Test Player',
+                            score: Math.floor(Math.random() * 1000) + 100,
+                            magnitude: 'Magnitude 1.0',
+                            date: new Date().toISOString()
+                        }
+                    ]
+                };
+
+                const response = await fetch(`${BASE_URL}/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                showResult(`Save successful!\nUpdated: ${data.metadata.updatedAt}\nData: ${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                showResult(`Save error: ${error.message}`, false);
+            }
+        }
+
+        async function createNewBin() {
+            try {
+                const testData = {
+                    leaderboard: [
+                        {
+                            name: 'New Test Player',
+                            score: 1500,
+                            magnitude: 'Magnitude 2.0',
+                            date: new Date().toISOString()
+                        }
+                    ]
+                };
+
+                const response = await fetch(BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const newBinId = data.metadata.id;
+                
+                showResult(`New bin created!\nBIN ID: ${newBinId}\nCreated: ${data.metadata.createdAt}\nData: ${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                showResult(`Error creating bin: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html>
+

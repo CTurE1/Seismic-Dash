@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Global Leaderboard Setup</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .step {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-left: 4px solid #007acc;
+            background: #f8f9fa;
+        }
+        .code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 Global Leaderboard Setup</h1>
+        
+        <div class="step">
+            <h2>Step 1: Create JSONBin.io Account</h2>
+            <p>1. Go to <a href="https://jsonbin.io" target="_blank">jsonbin.io</a></p>
+            <p>2. Register (free)</p>
+            <p>3. Get your API key in the "API Keys" section</p>
+        </div>
+
+        <div class="step">
+            <h2>Step 2: Create Bin</h2>
+            <p>Click the button below to create a new bin with initial data:</p>
+            <button onclick="createBin()">Create Bin</button>
+            <div id="createResult"></div>
+        </div>
+
+        <div class="step">
+            <h2>Step 3: Update Configuration</h2>
+            <p>After creating the bin, replace in file <code>config.js</code>:</p>
+            <div class="code">
+// Replace with your real BIN_ID
+BIN_ID: 'YOUR_BIN_ID_HERE',
+            </div>
+        </div>
+
+        <div class="step">
+            <h2>Step 4: Testing</h2>
+            <p>Click the button to test the connection:</p>
+            <button onclick="testConnection()">Test Connection</button>
+            <div id="testResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = '$2a$10$TU2kMRuYG3VK4cspRTU5Je6851NeZzUUSMZm5g4vfQmVQrZmDxoNe';
+        const BASE_URL = 'https://api.jsonbin.io/v3/b';
+
+        async function createBin() {
+            const resultDiv = document.getElementById('createResult');
+            resultDiv.innerHTML = '<p>Creating bin...</p>';
+
+            try {
+                const response = await fetch(BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        leaderboard: [
+                            {
+                                name: 'Test Player',
+                                score: 1000,
+                                magnitude: 'Magnitude 1.0',
+                                date: new Date().toISOString()
+                            }
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const binId = data.metadata.id;
+
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <h3>✅ Bin successfully created!</h3>
+                        <p><strong>BIN_ID:</strong> ${binId}</p>
+                        <p>Copy this ID and replace in config.js file</p>
+                    </div>
+                `;
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Error creating bin</h3>
+                        <p>${error.message}</p>
+                        <p>Check API key and try again</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testConnection() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = '<p>Testing connection...</p>';
+
+            // Get BIN_ID from input field or use your real BIN_ID
+            const binId = prompt('Enter your BIN_ID:') || '68b4cae043b1c97be9326e15';
+
+            try {
+                const response = await fetch(`${BASE_URL}/${binId}`, {
+                    headers: {
+                        'X-Master-Key': API_KEY
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const leaderboard = data.record.leaderboard || [];
+
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <h3>✅ Connection successful!</h3>
+                        <p>Records loaded: ${leaderboard.length}</p>
+                        <p>Last record: ${leaderboard[0] ? leaderboard[0].name : 'none'}</p>
+                    </div>
+                `;
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Connection error</h3>
+                        <p>${error.message}</p>
+                        <p>Check BIN_ID and API key</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
